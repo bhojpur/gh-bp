@@ -1,0 +1,50 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+function openRepository
+{
+    GITHUBURL=$(gh browse --no-browser)
+    BHOJPURURL="https://bhojpur.net#${GITHUBURL}"
+
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sensible-browser "${BHOJPURURL}" || x-www-browser "${BHOJPURURL}" ||  xdg-open "${BHOJPURURL}" || gnome-open "${BHOJPURURL}"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        open "${BHOJPURURL}" 
+    else
+        echo Error: unknown operating system, unable to open "${BHOJPURURL}"
+        exit 1
+    fi
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+  open|--open)
+    openRepository
+    exit 0
+    ;;
+  -h|--help)
+    cat << EOF
+GitHub Command line interface for Bhojpur.NET Platform
+Usage:
+  gh gp [command]
+Available Commands:
+  help                Help about any command
+  open                Opens the GitHub repository in a Bhojpur.NET Platform application
+Flags:
+  -h, --help   help for gh bp
+EOF
+    exit 0
+    ;;
+    *)
+    cat << EOF
+Error: unknown command "$1" for "gh bp"
+Run 'gh bp --help' for usage.
+EOF
+  exit 1
+  ;;
+  esac
+done
+
+# default behaviour is to open the repository
+openRepository
